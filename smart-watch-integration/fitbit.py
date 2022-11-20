@@ -80,15 +80,14 @@ def get_data_by_date(date):
 			breathing_rate = r['br'][0]['value']['breathingRate']
 		else:
 			breathing_rate = 0
-	else:
+	else: 
 		breathing_rate = 0
 
-	return r
-	#json.dumps({
-	#	"breathing_rate": breathing_rate,
-	#	"sleep_hrs": sleep_duration / 60,
-	#	"heart_rate": resting_heart_rate
-	#	})
+	return json.dumps({
+		"breathing_rate": breathing_rate,
+		"sleep_hrs": sleep_duration / 60,
+		"heart_rate": resting_heart_rate
+		})
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
