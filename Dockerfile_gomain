@@ -1,0 +1,5 @@
+FROM golang:1.18
+COPY /Go-backend /app
+WORKDIR /app
+EXPOSE 8000
+CMD ["go", "run", "Main-server/main/MainSv.go", "<", "Main-server/input.txt"]

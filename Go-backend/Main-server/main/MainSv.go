@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"io/ioutil"
@@ -37,7 +36,7 @@ func get_last_30days_data() string {
 	}
 	p_date := strconv.Itoa(p_year) + "-" + strconv.Itoa(int(p_month)) + "-" + p_zero_thing + strconv.Itoa(p_day)
 	date := strconv.Itoa(year) + "-" + strconv.Itoa(int(month)) + "-" + zero_thing + strconv.Itoa(day)
-	resp, err := c.Get(fmt.Sprintf("http://fitbit:4000/watch/%s/%s", p_date, date))
+	resp, err := c.Get(fmt.Sprintf("http://fitbit:80/watch/%s/%s", p_date, date))
 	if err != nil {
 		return fmt.Sprint("Error %s", err)
 	}
@@ -59,7 +58,8 @@ func get_requests(w http.ResponseWriter, r *http.Request) {
 		case "/stress_levels":
 			c := http.Client{}
 			data, _ := ioutil.ReadFile("data.txt")
-			req, _ := http.NewRequest("GET", "http://ai:5000/data", bytes.NewBuffer(data))
+			req, _ := http.NewRequest("GET", "http://ai:80/data", bytes.NewBuffer(data))
+			req.Header.Set("Content-Type", "application/json")
 			resp, _ := c.Do(req)
 			if resp.Status == "200 OK" {
 				body, _ := ioutil.ReadAll(resp.Body)
@@ -76,22 +76,8 @@ func get_requests(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Update data?[Yes/no]\n")
-	text, _ := reader.ReadString('\n')
-	good_text := false
-
-	for !good_text {
-		if text == "yes\n" || text == "Yes\n" || text == "\n" {
-			f, _ := os.Create("data.txt")
-			f.WriteString(get_last_30days_data())
-			good_text = true
-		} else if text == "No\n" || text == "no\n" {
-			good_text = true
-		} else {
-			print("Wrong answer![Yes/no]\n")
-		}
-	}
+	f, _ := os.Create("data.txt")
+	f.WriteString(get_last_30days_data())
 
 	print("Server is ready\n")
 	http.HandleFunc("/", get_requests)
