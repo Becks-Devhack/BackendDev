@@ -15,7 +15,7 @@ def get_today_data():
 	global access_token
 	global header
 
-	base_url = 'https://api.fitbit.com/1/user/-/sleep/date/today.json'
+	base_url = 'https://api.fitbit.com/1/user/-/br/date/today/today.json'
 	r = requests.get(base_url, headers=header).json()
 	if 'summary' in r:
 		sleep_duration = r['summary']['totalMinutesAsleep']
@@ -33,7 +33,7 @@ def get_today_data():
 	else:
 		resting_heart_rate = 0
 
-	base_url='  https://api.fitbit.com/1/user/-/br/date/today.json'
+	base_url='https://api.fitbit.com/1.2/user/-/sleep/date/today/today.json'
 	r = requests.get(base_url, headers=header).json()
 	if 'br' in r:
 		if len(r['br']):
@@ -50,19 +50,19 @@ def get_today_data():
 	})
 
 #you can also give date in the url
-@app.route("/stress_levels/<string:date>", methods=["GET"])
-def get_data_by_date(date):
+@app.route("/stress_levels/<string:start_date>/<string:end_date>", methods=["GET"])
+def get_data_by_date(start_date, end_date):
 	global access_token
 	global header
 	
-	base_url = 'https://api.fitbit.com/1/user/-/sleep/date/{}.json'.format(date)
+	base_url = 'https://api.fitbit.com/1/user/-/br/date/{}/{}.json'.format(start_date, end_date)
 	r = requests.get(base_url, headers=header).json()
 	if 'summary' in r:
 		sleep_duration = r['summary']['totalMinutesAsleep']
 	else:
 		sleep_duration = 0
 
-	base_url='https://api.fitbit.com/1/user/-/activities/heart/date/{}/{}/1min.json'.format(date, date)
+	base_url='https://api.fitbit.com/1/user/-/activities/heart/date/{}/{}/1min.json'.format(start_date, end_date)
 	r = requests.get(base_url, headers=header).json()
 	if 'activities-heart' in r:
 		if 'restingHeartRate' in r['activities-heart'][0]['value']:
@@ -73,7 +73,7 @@ def get_data_by_date(date):
 	else:
 		resting_heart_rate = 0
 
-	base_url='  https://api.fitbit.com/1/user/-/br/date/{}.json'.format(date)
+	base_url='https://api.fitbit.com/1.2/user/-/sleep/date/2{}/{}.json'.format(start_date, end_date)
 	r = requests.get(base_url, headers=header).json()
 	if 'br' in r:
 		if len(r['br']):
