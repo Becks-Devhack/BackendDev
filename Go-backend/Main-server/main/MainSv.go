@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"time"
+	// "json/decoder"
 )
 
 type full_data struct {
@@ -64,6 +65,26 @@ func get_requests(w http.ResponseWriter, r *http.Request) {
 			if resp.Status == "200 OK" {
 				body, _ := ioutil.ReadAll(resp.Body)
 				w.Write([]byte(body))
+			}
+			break
+		case "/vacation":
+			c := http.Client{}
+			data, _ := ioutil.ReadFile("data.txt")
+			req, _ := http.NewRequest("GET", "http://ai:80/data", bytes.NewBuffer(data))
+			req.Header.Set("Content-Type", "application/json")
+			resp, _ := c.Do(req)
+			if resp.Status == "200 OK" {
+				// body, _ := ioutil.ReadAll(resp.Body)
+				// json.Unmarshal(body, &body)
+				body := []byte("{\"time_series\": [2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2,3,3,3,3,3,3,3,3]}")
+
+				req, _ = http.NewRequest("GET", "http://ai:80/vacantion_prediction", bytes.NewBuffer(body))
+				req.Header.Set("Content-Type", "application/json")
+				resp, _ = c.Do(req)
+				if resp.Status == "200 OK" {
+					body, _ = ioutil.ReadAll(resp.Body)
+					w.Write([]byte(body))
+				}
 			}
 			break
 		default:
