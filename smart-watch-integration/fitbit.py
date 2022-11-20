@@ -9,83 +9,34 @@ app = Flask(__name__)
 access_token='eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyMzkzN0MiLCJzdWIiOiI5UUxYTU4iLCJpc3MiOiJGaXRiaXQiLCJ0eXAiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZXMiOiJyYWN0IHJveHkgcnJlcyByaHIgcm51dCBydGVtIHJzbGUiLCJleHAiOjE2Njk0NjcxNjMsImlhdCI6MTY2ODg2Mzk3Nn0.7OtUgSmIddTTzpHhZJBerIg9bcHiKamXXIon_SjfVWA'
 header = {'Authorization' : 'Bearer {}'.format(access_token)}
 
-#default returns today's data
-@app.route("/stress_levels", methods=["GET"])
-def get_today_data():
-	global access_token
-	global header
-
-	base_url = 'https://api.fitbit.com/1/user/-/br/date/today/today.json'
-	r = requests.get(base_url, headers=header).json()
-	if 'summary' in r:
-		sleep_duration = r['summary']['totalMinutesAsleep']
-	else:
-		sleep_duration = 0
-
-	base_url='https://api.fitbit.com/1/user/-/activities/heart/date/today/today/1min.json'
-	r = requests.get(base_url, headers=header).json()
-	if 'activities-heart' in r:
-		if 'restingHeartRate' in r['activities-heart'][0]['value']:
-			resting_heart_rate = r['activities-heart'][0]['value']['restingHeartRate']
-		else:
-			resting_heart_rate = 0
-
-	else:
-		resting_heart_rate = 0
-
-	base_url='https://api.fitbit.com/1.2/user/-/sleep/date/today/today.json'
-	r = requests.get(base_url, headers=header).json()
-	if 'br' in r:
-		if len(r['br']):
-			breathing_rate = r['br'][0]['value']['breathingRate']
-		else:
-			breathing_rate = 0
-	else:
-		breathing_rate = 0
-
-	return json.dumps({
-		"breathing_rate": breathing_rate,
-	    "sleep_hrs": sleep_duration / 3600000,
-	    "heart_rate": resting_heart_rate
-	})
-
 #you can also give date in the url
 @app.route("/stress_levels/<string:start_date>/<string:end_date>", methods=["GET"])
 def get_data_by_date(start_date, end_date):
 	global access_token
 	global header
 	
-	base_url = 'https://api.fitbit.com/1/user/-/br/date/{}/{}.json'.format(start_date, end_date)
+	base_url = 'https://api.fitbit.com/1.2/user/-/sleep/date/{}/{}.json'.format(start_date, end_date)
 	r = requests.get(base_url, headers=header).json()
-	if 'summary' in r:
-		sleep_duration = r['summary']['totalMinutesAsleep']
-	else:
-		sleep_duration = 0
+	sleep_duration = []
+	for i in range(len(r['sleep'])):
+		sleep_duration.append(r['sleep'][i].get('duration', 0) / 3600000)
 
 	base_url='https://api.fitbit.com/1/user/-/activities/heart/date/{}/{}/1min.json'.format(start_date, end_date)
 	r = requests.get(base_url, headers=header).json()
-	if 'activities-heart' in r:
-		if 'restingHeartRate' in r['activities-heart'][0]['value']:
-			resting_heart_rate = r['activities-heart'][0]['value']['restingHeartRate']
-		else:
-			resting_heart_rate = 0
+	resting_heart_rate = []
+	for i in range(len(r['activities-heart'])):
+		resting_heart_rate.append(r['activities-heart'][i]['value'].get('restingHeartRate', 0))
 
-	else:
-		resting_heart_rate = 0
 
-	base_url='https://api.fitbit.com/1.2/user/-/sleep/date/2{}/{}.json'.format(start_date, end_date)
+	base_url='https://api.fitbit.com/1/user/-/br/date/{}/{}.json'.format(start_date, end_date)
 	r = requests.get(base_url, headers=header).json()
-	if 'br' in r:
-		if len(r['br']):
-			breathing_rate = r['br'][0]['value']['breathingRate']
-		else:
-			breathing_rate = 0
-	else: 
-		breathing_rate = 0
+	breathing_rate = []
+	for i in range(len(r['br'])):
+		breathing_rate.append(r['br'][i]['value'].get('breathingRate', 0))
 
 	return json.dumps({
 		"breathing_rate": breathing_rate,
-		"sleep_hrs": sleep_duration / 60,
+		"sleep_hrs": sleep_duration,
 		"heart_rate": resting_heart_rate
 		})
 
