@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM fitbit_aq:latest
 COPY requirements.txt /tmp
 RUN pip install -r /tmp/requirements.txt
 COPY /smart-watch-integration /app

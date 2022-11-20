@@ -1,4 +1,4 @@
-FROM golang:1.18-alpine
+FROM fitbit_goback:latest
 COPY /Go-backend /app
 WORKDIR /app
 EXPOSE 80
