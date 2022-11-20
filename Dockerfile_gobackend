@@ -1,5 +1,5 @@
-FROM fitbit_goback:latest
+FROM golang:1.18
 COPY /Go-backend /app
 WORKDIR /app
-EXPOSE 80
-CMD ["go", "run", "main/APKSv.go"]
+EXPOSE 8000
+CMD ["go", "run", "APK-server/main/APKSv.go"]
