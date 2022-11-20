@@ -9,7 +9,7 @@ access_token='eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyMzkzN0MiLCJzdWIiOiI5UUxYTU4iLCJpc
 header = {'Authorization' : 'Bearer {}'.format(access_token)}
 
 #you can also give date in the url
-@app.route("/stress_levels/<string:start_date>/<string:end_date>", methods=["GET"])
+@app.route("/watch/<string:start_date>/<string:end_date>", methods=["GET"])
 def get_data_by_date(start_date, end_date):
 	global access_token
 	global header
