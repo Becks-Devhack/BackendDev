@@ -17,19 +17,29 @@ def get_today_data():
 
 	base_url = 'https://api.fitbit.com/1/user/-/sleep/date/today.json'
 	r = requests.get(base_url, headers=header).json()
-	sleep_duration = r['summary']['totalMinutesAsleep']
+	if 'summary' in r:
+		sleep_duration = r['summary']['totalMinutesAsleep']
+	else:
+		sleep_duration = 0
 
 	base_url='https://api.fitbit.com/1/user/-/activities/heart/date/today/today/1min.json'
 	r = requests.get(base_url, headers=header).json()
-	if 'restingHeartRate' in r['activities-heart'][0]['value']:
-		resting_heart_rate = r['activities-heart'][0]['value']['restingHeartRate']
+	if 'activities-heart' in r:
+		if 'restingHeartRate' in r['activities-heart'][0]['value']:
+			resting_heart_rate = r['activities-heart'][0]['value']['restingHeartRate']
+		else:
+			resting_heart_rate = 0
+
 	else:
 		resting_heart_rate = 0
 
 	base_url='  https://api.fitbit.com/1/user/-/br/date/today.json'
 	r = requests.get(base_url, headers=header).json()
-	if len(r['br']):
-		breathing_rate = r['br'][0]['value']['breathingRate']
+	if 'br' in r:
+		if len(r['br']):
+			breathing_rate = r['br'][0]['value']['breathingRate']
+		else:
+			breathing_rate = 0
 	else:
 		breathing_rate = 0
 
@@ -47,27 +57,38 @@ def get_data_by_date(date):
 	
 	base_url = 'https://api.fitbit.com/1/user/-/sleep/date/{}.json'.format(date)
 	r = requests.get(base_url, headers=header).json()
-	sleep_duration = r['summary']['totalMinutesAsleep']
+	if 'summary' in r:
+		sleep_duration = r['summary']['totalMinutesAsleep']
+	else:
+		sleep_duration = 0
 
 	base_url='https://api.fitbit.com/1/user/-/activities/heart/date/{}/{}/1min.json'.format(date, date)
 	r = requests.get(base_url, headers=header).json()
-	if 'restingHeartRate' in r['activities-heart'][0]['value']:
-		resting_heart_rate = r['activities-heart'][0]['value']['restingHeartRate']
+	if 'activities-heart' in r:
+		if 'restingHeartRate' in r['activities-heart'][0]['value']:
+			resting_heart_rate = r['activities-heart'][0]['value']['restingHeartRate']
+		else:
+			resting_heart_rate = 0
+
 	else:
 		resting_heart_rate = 0
 
 	base_url='  https://api.fitbit.com/1/user/-/br/date/{}.json'.format(date)
 	r = requests.get(base_url, headers=header).json()
-	if len(r['br']):
-		breathing_rate = r['br'][0]['value']['breathingRate']
+	if 'br' in r:
+		if len(r['br']):
+			breathing_rate = r['br'][0]['value']['breathingRate']
+		else:
+			breathing_rate = 0
 	else:
 		breathing_rate = 0
 
-	return json.dumps({
-		"breathing_rate": breathing_rate,
-	    "sleep_hrs": sleep_duration / 60,
-	    "heart_rate": resting_heart_rate
-	})
+	return r
+	#json.dumps({
+	#	"breathing_rate": breathing_rate,
+	#	"sleep_hrs": sleep_duration / 60,
+	#	"heart_rate": resting_heart_rate
+	#	})
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
