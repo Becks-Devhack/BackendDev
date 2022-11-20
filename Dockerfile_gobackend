@@ -1,0 +1,5 @@
+FROM golang:1.18-alpine
+COPY /Go-backend /app
+WORKDIR /app
+EXPOSE 80
+CMD ["go", "run", "main/APKSv.go"]
